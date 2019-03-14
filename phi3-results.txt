@@ -1,0 +1,24 @@
+Compile with different options on Skylake Gold, e.g.:
+icc -O3 -I /home/users/cerati/miniconda2/include/ xtensor-test.cc -o xtensor-test.exe
+Reporting best time of at least 3 tries.
+
+-O3 -xCOMMON-AVX512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.88 s
+
+-O3 -xCORE-AVX512 -qopt-zmm-usage=high -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.91 s
+
+-O3 -xCORE-AVX512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.89 s
+
+-O3 -mavx2 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 3.08 s
+
+-O3 -mavx -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 3.06 s
+
+-O3 -xCOMMON-AVX512
+time for NN=10000000 multiplications is 6.88 s
+
+-O3
+time for NN=10000000 multiplications is 7.02 s

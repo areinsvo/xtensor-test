@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[])
 {
-  constexpr size_t NN = 20000000;
+  constexpr size_t NN = 10000000;
 
   MatriplXT66 A;
   for (size_t i=0;i<36;++i) A[i] = xt::random::randn<float>({NN});
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
     C.print(std::cout,nn);
   }
 
-  std::cout << "time for NN=" << NN << " multiplicatios is " << float(end-begin)/CLOCKS_PER_SEC << " s" << std::endl;
+  std::cout << "time for NN=" << NN << " multiplications is " << float(end-begin)/CLOCKS_PER_SEC << " s" << std::endl;
 
   return 0;
 }
