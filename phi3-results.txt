@@ -1,15 +1,20 @@
-Compile with different options on Skylake Gold, e.g.:
+Compile with different options on Skylake Gold.
+
+Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GH
+
+———————————————————————————————————————————————————————————
+
+which icc
+/opt/intel/compilers_and_libraries_2019.0.117/linux/bin/intel64/icc
+
 icc -O3 -I /home/users/cerati/miniconda2/include/ xtensor-test.cc -o xtensor-test.exe
-Reporting best time of at least 3 tries.
+time for NN=10000000 multiplications is 7.02 s
 
--O3 -xCOMMON-AVX512 -DXTENSOR_USE_XSIMD
-time for NN=10000000 multiplications is 2.88 s
+-O3 -no-vec
+time for NN=10000000 multiplications is 7.02 s
 
--O3 -xCORE-AVX512 -qopt-zmm-usage=high -DXTENSOR_USE_XSIMD
-time for NN=10000000 multiplications is 2.91 s
-
--O3 -xCORE-AVX512 -DXTENSOR_USE_XSIMD
-time for NN=10000000 multiplications is 2.89 s
+-O3 -xCOMMON-AVX512
+time for NN=10000000 multiplications is 6.88 s
 
 -O3 -mavx2 -DXTENSOR_USE_XSIMD
 time for NN=10000000 multiplications is 3.08 s
@@ -17,8 +22,43 @@ time for NN=10000000 multiplications is 3.08 s
 -O3 -mavx -DXTENSOR_USE_XSIMD
 time for NN=10000000 multiplications is 3.06 s
 
--O3 -xCOMMON-AVX512
-time for NN=10000000 multiplications is 6.88 s
+-O3 -xCORE-AVX512 -qopt-zmm-usage=high -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.91 s
 
--O3
-time for NN=10000000 multiplications is 7.02 s
+-O3 -xCORE-AVX512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.89 s
+
+-O3 -xCOMMON-AVX512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.88 s
+
+-O3 -march=skylake-avx512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.87 s
+
+———————————————————————————————————————————————————————————
+
+which g++
+/cvmfs/cms.cern.ch/slc7_amd64_gcc630/external/gcc/6.3.0/bin/g++
+
+g++ -O3 -I /home/users/cerati/miniconda2/include/ xtensor-test.cc -o xtensor-test.exe
+time for NN=10000000 multiplications is 3.79 s
+
+-O3 -fno-tree-loop-vectorize
+time for NN=10000000 multiplications is 3.99 s
+
+-O3 -mavx
+time for NN=10000000 multiplications is 3.79 s
+
+-O3 -fno-tree-loop-vectorize -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 3.66 s
+
+-O3 -mavx -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 3.15 s
+
+-O3 -mavx2 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.9 s
+
+-O3 -march=skylake -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.83 s
+
+-O3 -march=skylake-avx512 -DXTENSOR_USE_XSIMD
+time for NN=10000000 multiplications is 2.79 s
