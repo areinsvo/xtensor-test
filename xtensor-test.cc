@@ -9,7 +9,7 @@
 
 // /usr/local/Cellar/gcc/7.1.0/bin/c++-7 -O2 -mavx -DXTENSOR_USE_XSIMD -I /Users/cerati/miniconda3/include/ xtensor-test.cc -o xtensor-test.exe
 
-constexpr size_t NN = 16*600;//000;//10000000;
+constexpr size_t NN = 16*600000;//10000000;
 
 void test_v0(std::array<xt::xarray<float>, 36>& input, int type) {
 
@@ -105,9 +105,12 @@ void test_v2(std::array<xt::xarray<float>, 36>& input, int type) {
 }
 
 void test_plain(std::array<xt::xarray<float>, 36>& input) {
-  std::array<float, NN*36> Ax;Ax.fill(0.);
-  std::array<float, NN*36> Bx;Bx.fill(0.);
-  std::array<float, NN*36> Cx;Cx.fill(0.);
+  //
+  float* Ax = new float[NN*36];
+  float* Bx = new float[NN*36];
+  float* Cx = new float[NN*36];
+  for (size_t j=0;j<NN*36;++j) Cx[j]=0.;
+  //
   for (size_t x=0;x<NN/16;++x) {
     for (size_t i=0;i<36;++i) {
       for (size_t n=0;n<16;++n) {
@@ -154,6 +157,7 @@ void test_plain(std::array<xt::xarray<float>, 36>& input) {
             << Cx[16*(5*6+0)] << " " << Cx[16*(5*6+1)] << " " << Cx[16*(5*6+2)] << " " << Cx[16*(5*6+3)] << " " << Cx[16*(5*6+4)] << " " << Cx[16*(5*6+5)] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
   std::cout << "plain -- time for NN=" << NN << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN) << std::endl;
+  delete Ax, Bx, Cx;
 }
 
 int main(int argc, char* argv[])
@@ -178,6 +182,7 @@ int main(int argc, char* argv[])
   test_v2(input,1);
   test_v2(input,2);
   std::cout << std::endl;
+
   test_plain(input);
 
   return 0;
