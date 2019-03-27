@@ -1,0 +1,47 @@
+Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GH
+
+-----------------------------------------------------------------------------------------------------
+
+which icc
+/opt/intel/compilers_and_libraries_2019.0.117/linux/bin/intel64/icc
+
+-----------------------------------------------------------------------------------------------------
+
+icc -O3 -march=skylake-avx512 -DXTENSOR_USE_XSIMD -I /home/users/cerati/miniconda2/include/ xtensor-test.cc -o xtensor-test.exe
+
+v0 -- time for NN=9600000 multiplications is 2.32 s, i.e. per track [s]=2.41667e-07
+v0 -- time for NN=9600000 multiplications is 2.79 s, i.e. per track [s]=2.90625e-07
+v0 -- time for NN=9600000 multiplications is 13.37 s (loop version), i.e. per track [s]=1.39271e-06
+v0 -- time for NN=9600000 multiplications is 13.82 s (loop-tile version), i.e. per track [s]=1.43958e-06
+
+v1 -- time for NN=9600000 multiplications is 6.74 s, i.e. per track [s]=7.02083e-07
+v1 -- time for NN=9600000 multiplications is 12.19 s (loop version), i.e. per track [s]=1.26979e-06
+
+v2 -- time for NN=9600000 multiplications is 2.87 s, i.e. per track [s]=2.98958e-07
+v2 -- time for NN=9600000 multiplications is 10.22 s (loop version), i.e. per track [s]=1.06458e-06
+
+plainArray_matrix -- time for NN=9600000 multiplications is 0.66 s, i.e. per track [s]=6.875e-08
+plainArray_element -- time for NN=9600000 multiplications is 1.78 s, i.e. per track [s]=1.85417e-07
+plainArray_el16mx (plain loop) -- time for NN=9600000 multiplications is 0.57 s, i.e. per track [s]=5.9375e-08
+plainArray_el16mx (mplex loop) -- time for NN=9600000 multiplications is 0.52 s, i.e. per track [s]=5.41667e-08
+
+
+-----------------------------------------------------------------------------------------------------
+
+icc -O3 -no-vec -I /home/users/cerati/miniconda2/include/ xtensor-test.cc -o xtensor-test.exe
+
+v0 -- time for NN=9600000 multiplications is 7 s, i.e. per track [s]=7.29167e-07
+v0 -- time for NN=9600000 multiplications is 7.2 s, i.e. per track [s]=7.5e-07
+v0 -- time for NN=9600000 multiplications is 13.34 s (loop version), i.e. per track [s]=1.38958e-06
+v0 -- time for NN=9600000 multiplications is 13.15 s (loop-tile version), i.e. per track [s]=1.36979e-06
+
+v1 -- time for NN=9600000 multiplications is 11.16 s, i.e. per track [s]=1.1625e-06
+v1 -- time for NN=9600000 multiplications is 35.86 s (loop version), i.e. per track [s]=3.73542e-06
+
+v2 -- time for NN=9600000 multiplications is 10.64 s, i.e. per track [s]=1.10833e-06
+v2 -- time for NN=9600000 multiplications is 24.45 s (loop version), i.e. per track [s]=2.54688e-06
+
+plainArray_matrix -- time for NN=9600000 multiplications is 1.62 s, i.e. per track [s]=1.6875e-07
+plainArray_element -- time for NN=9600000 multiplications is 3.06 s, i.e. per track [s]=3.1875e-07
+plainArray_el16mx (plain loop) -- time for NN=9600000 multiplications is 1.55 s, i.e. per track [s]=1.61458e-07
+plainArray_el16mx (mplex loop) -- time for NN=9600000 multiplications is 1.57 s, i.e. per track [s]=1.63542e-07
