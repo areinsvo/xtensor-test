@@ -3,11 +3,13 @@
 CC=icpc
 # CC=g++
 INC=-I${CALIPER_DIR}/include
-INC+=-I/home/users/gravelle/soft/anaconda3/include
+INC+=-I${CONDA_DIR}include
 LIB=-L${CALIPER_DIR}/lib64 -lcaliper
 
 OPT=-g
-OPT+=-O2
+OPT+=-O3
+OPT+=-march=skylake-avx512 
+OPT+=-DXTENSOR_USE_XSIMD
 
 all: xtensor-test
 
