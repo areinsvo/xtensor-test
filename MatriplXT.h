@@ -1,12 +1,9 @@
 #include <iostream>
 #include "xtensor/xarray.hpp"
-<<<<<<< HEAD
 #include <caliper/cali.h>
 #include <stdlib.h>
 #include <stdio.h>
-=======
 #include "xtensor/xfixed.hpp"
->>>>>>> master
 
 class MatriplXT66
 {
