@@ -102,5 +102,21 @@ int main(int argc, char* argv[])
     xt::xarray<int> res_af = vecf(xt::view(arra,0,xt::all()), xt::view(arrb,0,xt::all()));
     std::cout << res_af << std::endl;
 
+    xt::xtensor_fixed<float, xt::xshape<2> > a_ = { 1, 2};
+    std::cout << a_ << std::endl;
+    xt::xtensor_fixed<float, xt::xshape<2> > b_ = { 11, 22};
+
+    //std::array< xt::xtensor_fixed<float, xt::xshape<2> >,2 > ab_ = {a_, b_};
+    xt::xtensor_fixed<float, xt::xshape<2> >* ab_ = new xt::xtensor_fixed<float, xt::xshape<2> >[2];
+    ab_[0] = a_;
+    ab_[1] = b_;
+    std::cout << ab_[1] << std::endl;
+    ab_[0] = {3,4};
+    std::cout << ab_[0] << std::endl;
+    xt::xarray<float> tmp = { 2,  3 };
+    ab_[1] = tmp;
+    std::cout << ab_[1] << std::endl;
+    // delete ab_;
+
     return 0;
 }
