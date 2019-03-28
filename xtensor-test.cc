@@ -247,11 +247,11 @@ void test_plainArray_element(const std::array<xt::xarray<float>, 36>& input, con
   delete Ax, Bx, Cx;
 }
 
-void test_plainArray_el16mx(const std::array<xt::xarray<float>, 36>& input, const int type) {
+void test_plainArray_el16mx(const std::array<xt::xarray<float>, 36>& input, const int type, bool align) {
   //
-  float* Ax = new float[NN*36];
-  float* Bx = new float[NN*36];
-  float* Cx = new float[NN*36];
+  float* Ax = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
+  float* Bx = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
+  float* Cx = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
   for (size_t j=0;j<NN*36;++j) Cx[j]=0.;
   //
   // store in element order for bunches of 16 matrices (a la matriplex)
@@ -345,10 +345,17 @@ void test_plainArray_el16mx(const std::array<xt::xarray<float>, 36>& input, cons
             << Cx[16*(4*6+0)] << "\t" << Cx[16*(4*6+1)] << "\t" << Cx[16*(4*6+2)] << "\t" << Cx[16*(4*6+3)] << "\t" << Cx[16*(4*6+4)] << "\t" << Cx[16*(4*6+5)] << std::endl
             << Cx[16*(5*6+0)] << "\t" << Cx[16*(5*6+1)] << "\t" << Cx[16*(5*6+2)] << "\t" << Cx[16*(5*6+3)] << "\t" << Cx[16*(5*6+4)] << "\t" << Cx[16*(5*6+5)] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  if (type==1) std::cout << "plainArray_el16mx (mplex loop) -- time for NN=" << NN << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN) << std::endl;
-  else std::cout << "plainArray_el16mx (plain loop) -- time for NN=" << NN << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN) << std::endl;
-  delete Ax, Bx, Cx;
+  if (type==1) std::cout << "plainArray_el16mx (mplex loop) with align=" << align << " -- time for NN=" << NN << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN) << std::endl;
+  else std::cout << "plainArray_el16mx (plain loop) with align=" << align << " -- time for NN=" << NN << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN) << std::endl;
+  if (align) {
+    _mm_free(Ax);
+    _mm_free(Bx);
+    _mm_free(Cx);
+  } else {
+    delete Ax, Bx, Cx;
+  }
 }
+
 int main(int argc, char* argv[])
 {
 
@@ -377,9 +384,11 @@ int main(int argc, char* argv[])
   std::cout << std::endl;
   test_plainArray_element(input,0);
   std::cout << std::endl;
-  test_plainArray_el16mx(input,0);
+  test_plainArray_el16mx(input,0,0);
   std::cout << std::endl;
-  test_plainArray_el16mx(input,1);
+  test_plainArray_el16mx(input,1,0);
+  std::cout << std::endl;
+  test_plainArray_el16mx(input,1,1);
 
   return 0;
 }
