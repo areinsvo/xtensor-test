@@ -97,31 +97,29 @@ class MatriplXT66_v3
 {
   //
 public:
-  MatriplXT66_v3() { m_ = new xt::xtensor_fixed<float, xt::xshape<NN> >[36]; }
-  //~MatriplXT66_v3() { delete m_; }
+  MatriplXT66_v3() { m_ = new xt::xtensor_fixed<float, xt::xshape<NN,36>, xt::layout_type::column_major>(); }
+  ~MatriplXT66_v3() {delete m_;}
   //
-  xt::xtensor_fixed<float, xt::xshape<NN> >& operator[] (size_t k) { return m_[k]; }
-  const xt::xtensor_fixed<float, xt::xshape<NN> >& operator[] (size_t k) const { return m_[k]; }
+  auto operator[] (size_t k) { return xt::view(*m_,xt::all(),k); }
+  const auto operator[] (size_t k) const { return xt::view(*m_,xt::all(),k); }
   //
-  xt::xtensor_fixed<float, xt::xshape<NN> >& operator() (size_t i, size_t j) { return m_[i * 6 + j]; }
-  const xt::xtensor_fixed<float, xt::xshape<NN> >& operator() (size_t i, size_t j) const { return m_[i * 6 + j]; }
+  auto operator() (size_t i, size_t j) { return xt::view((*m_),xt::all(),i * 6 + j); }
+  const auto operator() (size_t i, size_t j) const { return xt::view((*m_),xt::all(),i * 6 + j); }
   //
-  float operator() (size_t i, size_t j, size_t n) const { return m_[i * 6 + j](n); }
-  //
+  float operator() (size_t i, size_t j, size_t n) const { return (*m_)(n,i * 6 + j); }
   void print(std::ostream& os, size_t n)
   {
     for (size_t i=0; i<6; i++) {
       for (size_t j=0; j<6; j++) {
-        os << m_[i * 6 + j](n) << "\t";
+        os << (*m_)(n,i * 6 + j) << "\t";
       }
       os << std::endl;
     }
   }
   //
-private:
+ private:
   //
-  /* std::array< xt::xtensor_fixed<float, xt::xshape<NN> >, 36 > m_; */
-  xt::xtensor_fixed<float, xt::xshape<NN> >* m_;
+  xt::xtensor_fixed<float, xt::xshape<NN,36>, xt::layout_type::column_major>* m_;
 };
 
 

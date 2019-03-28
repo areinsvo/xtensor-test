@@ -370,8 +370,8 @@ int main(int argc, char* argv[])
   test_v2(input,1);
   // test_v2(input,2);
   std::cout << std::endl;
-  // test_v3(input,0);//this is the fastest for small NN, but gets slower and crashes for full size
-  // std::cout << std::endl;
+  test_v3(input,0);
+  std::cout << std::endl;
 
   test_plainArray_matrix(input,0);
   std::cout << std::endl;
