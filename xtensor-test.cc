@@ -105,7 +105,9 @@ void test_v2(std::array<xt::xarray<float>, 36>& input, int type) {
 }
 
 void test_plain(std::array<xt::xarray<float>, 36>& input) {
-  //
+  #ifdef USE_CALI
+  CALI_CXX_MARK_FUNCTION;
+  #endif
   float* Ax = new float[NN*36];
   float* Bx = new float[NN*36];
   float* Cx = new float[NN*36];

@@ -99,7 +99,9 @@ void MultiplyXT66(const MatriplXT66& A,
                   const MatriplXT66& B,
                         MatriplXT66& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   C[ 0] = A[ 0]*B[ 0] + A[ 1]*B[ 6] + A[ 2]*B[12] + A[ 3]*B[18] + A[ 4]*B[24] + A[ 5]*B[30];
   C[ 1] = A[ 0]*B[ 1] + A[ 1]*B[ 7] + A[ 2]*B[13] + A[ 3]*B[19] + A[ 4]*B[25] + A[ 5]*B[31];
   C[ 2] = A[ 0]*B[ 2] + A[ 1]*B[ 8] + A[ 2]*B[14] + A[ 3]*B[20] + A[ 4]*B[26] + A[ 5]*B[32];
@@ -142,7 +144,9 @@ void MultiplyXT66(const MatriplXT66_v1& A,
                   const MatriplXT66_v1& B,
                         MatriplXT66_v1& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   C[ 0] = A[ 0]*B[ 0] + A[ 1]*B[ 6] + A[ 2]*B[12] + A[ 3]*B[18] + A[ 4]*B[24] + A[ 5]*B[30];
   C[ 1] = A[ 0]*B[ 1] + A[ 1]*B[ 7] + A[ 2]*B[13] + A[ 3]*B[19] + A[ 4]*B[25] + A[ 5]*B[31];
   C[ 2] = A[ 0]*B[ 2] + A[ 1]*B[ 8] + A[ 2]*B[14] + A[ 3]*B[20] + A[ 4]*B[26] + A[ 5]*B[32];
@@ -185,7 +189,9 @@ void MultiplyXT66(const MatriplXT66_v2& A,
                   const MatriplXT66_v2& B,
                         MatriplXT66_v2& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   C[ 0] = A[ 0]*B[ 0] + A[ 1]*B[ 6] + A[ 2]*B[12] + A[ 3]*B[18] + A[ 4]*B[24] + A[ 5]*B[30];
   C[ 1] = A[ 0]*B[ 1] + A[ 1]*B[ 7] + A[ 2]*B[13] + A[ 3]*B[19] + A[ 4]*B[25] + A[ 5]*B[31];
   C[ 2] = A[ 0]*B[ 2] + A[ 1]*B[ 8] + A[ 2]*B[14] + A[ 3]*B[20] + A[ 4]*B[26] + A[ 5]*B[32];
@@ -228,7 +234,9 @@ void MultiplyXT66LoopTile(const MatriplXT66& A,
                           const MatriplXT66& B,
                           MatriplXT66& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   #define TILE 2
   /* Loop over all the tiles, stride by tile size */
   for ( int it=0; it<6; it+=TILE ) {
@@ -252,7 +260,9 @@ void MultiplyXT66Loop(const MatriplXT66& A,
                       const MatriplXT66& B,
                       MatriplXT66& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   for (size_t i=0; i<6; ++i) {
     for (size_t j=0; j<6; ++j) {
       C(i,j) = 0;
@@ -267,7 +277,9 @@ void MultiplyXT66Loop(const MatriplXT66_v1& A,
                       const MatriplXT66_v1& B,
                       MatriplXT66_v1& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   for (size_t i=0; i<6; ++i) {
     for (size_t j=0; j<6; ++j) {
       C(i,j) = 0;
@@ -282,7 +294,9 @@ void MultiplyXT66Loop(const MatriplXT66_v2& A,
                       const MatriplXT66_v2& B,
                       MatriplXT66_v2& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   for (size_t i=0; i<6; ++i) {
     for (size_t j=0; j<6; ++j) {
       C(i,j) = 0;
@@ -297,7 +311,9 @@ void MultiplyXT66Stack(const MatriplXT66_v1& A,
                        const MatriplXT66_v1& B,
                        MatriplXT66_v1& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   auto C00 = A[ 0]*B[ 0] + A[ 1]*B[ 6] + A[ 2]*B[12] + A[ 3]*B[18] + A[ 4]*B[24] + A[ 5]*B[30];
   auto C01 = A[ 0]*B[ 1] + A[ 1]*B[ 7] + A[ 2]*B[13] + A[ 3]*B[19] + A[ 4]*B[25] + A[ 5]*B[31];
   auto C02 = A[ 0]*B[ 2] + A[ 1]*B[ 8] + A[ 2]*B[14] + A[ 3]*B[20] + A[ 4]*B[26] + A[ 5]*B[32];
@@ -346,7 +362,9 @@ void MultiplyXT66Stack(const MatriplXT66_v2& A,
 		       const MatriplXT66_v2& B,
 		       MatriplXT66_v2& C)
 {
+  #ifdef USE_CALI
   CALI_CXX_MARK_FUNCTION;
+  #endif
   auto C00 = A[ 0]*B[ 0] + A[ 1]*B[ 6] + A[ 2]*B[12] + A[ 3]*B[18] + A[ 4]*B[24] + A[ 5]*B[30];
   auto C01 = A[ 0]*B[ 1] + A[ 1]*B[ 7] + A[ 2]*B[13] + A[ 3]*B[19] + A[ 4]*B[25] + A[ 5]*B[31];
   auto C02 = A[ 0]*B[ 2] + A[ 1]*B[ 8] + A[ 2]*B[14] + A[ 3]*B[20] + A[ 4]*B[26] + A[ 5]*B[32];
