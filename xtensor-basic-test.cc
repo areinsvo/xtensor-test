@@ -118,5 +118,27 @@ int main(int argc, char* argv[])
     std::cout << ab_[1] << std::endl;
     // delete ab_;
 
+    using vector_type = std::vector<float, XSIMD_DEFAULT_ALLOCATOR(float)>;
+    using b_type = xsimd::simd_type<float>;
+    constexpr size_t NN = 16;//*600000;//10000000;
+    const vector_type aaa(NN,1.);
+    const vector_type bbb(NN,2.);
+    vector_type ccc(NN,0.);
+    std::size_t inc = b_type::size;
+    std::size_t size = NN;//res.size();
+    // size for which the vectorization is possible
+    std::size_t vec_size = size - size % inc;
+    std::cout << "vec_size=" << vec_size << " size=" << size << " inc=" << inc << " (size % inc)=" << (size % inc) << std::endl;
+    for(std::size_t i = 0; i < vec_size; i += inc)
+      {
+        b_type avec = xsimd::load_aligned(&aaa[i]);
+        b_type bvec = xsimd::load_aligned(&bbb[i]);
+        b_type rvec = (avec + bvec) / 2;
+        rvec.store_aligned(&ccc[i]);
+      }
+    std::cout << "ccc=";
+    for (auto ic : ccc) std::cout << ic << ", ";
+    std::cout << std::endl;
+
     return 0;
 }
