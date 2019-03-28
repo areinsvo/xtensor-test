@@ -4,14 +4,20 @@ CC=icpc
 # CC=g++
 
 USE_CALI:=1
+USE_OPTS:=1
 
 INC=-I${CONDA_DIR}include
 
-OPT=-g
-OPT+=-O3
-OPT+=-march=skylake-avx512 
-OPT+=-qopt-zmm-usage=high 
-OPT+=-DXTENSOR_USE_XSIMD
+ifdef USE_OPTS
+	OPT=-g
+	OPT+=-O3
+	OPT+=-march=skylake-avx512 
+	OPT+=-qopt-zmm-usage=high 
+	OPT+=-DXTENSOR_USE_XSIMD
+else
+	OPT=-g
+	OPT+=-no-vec
+endif
 
 ifdef USE_CALI
 	LIB=-L${CALIPER_DIR}/lib64 -lcaliper

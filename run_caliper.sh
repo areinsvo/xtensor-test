@@ -20,17 +20,17 @@ $CMD
 
 export CALI_REPORT_FILENAME=$DIR/cali_128_packed_ops_many.json
 # note the difference from TAU counters - no PAPI_NATIVE_
-export CALI_PAPI_COUNTERS=FP_ARITH:128B_PACKED_DOUBLE
+export CALI_PAPI_COUNTERS=FP_ARITH:128B_PACKED_SINGLE
 $CMD
 
 export CALI_REPORT_FILENAME=$DIR/cali_256_packed_ops_many.json
 # note the difference from TAU counters - no PAPI_NATIVE_
-export CALI_PAPI_COUNTERS=FP_ARITH:256B_PACKED_DOUBLE
+export CALI_PAPI_COUNTERS=FP_ARITH:256B_PACKED_SINGLE
 $CMD
 
 export CALI_REPORT_FILENAME=$DIR/cali_512_packed_ops_many.json
 # note the difference from TAU counters - no PAPI_NATIVE_
-export CALI_PAPI_COUNTERS=FP_ARITH:512B_PACKED_DOUBLE
+export CALI_PAPI_COUNTERS=FP_ARITH:512B_PACKED_SINGLE
 $CMD
 
 export CALI_REPORT_FILENAME=$DIR/cali_scalar_double_many.json
