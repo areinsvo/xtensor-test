@@ -456,6 +456,7 @@ void plainArray_matrix_mult66(const float* Ax, const float* Bx, float* Cx) {
     const size_t Nx = x*36;
     for (size_t i = 0; i < 6; ++i) {
       for (size_t j = 0; j < 6; ++j) {
+	Cx[ Nx + (i*6 + j) ] = 0.;
 	for (size_t k = 0; k < 6; ++k) {
 	  Cx[ Nx + (i*6 + j) ] += Ax[ Nx + (i*6 + k) ] * Bx[ Nx + (k*6 + j) ];
 	}
@@ -468,6 +469,7 @@ void plainArray_element_mult66(const float* Ax, const float* Bx, float* Cx) {
   for (size_t x = 0; x < NN; ++x) {
     for (size_t i = 0; i < 6; ++i) {
       for (size_t j = 0; j < 6; ++j) {
+	Cx[ x + (i*6 + j)*NN ] = 0.;
         for (size_t k = 0; k < 6; ++k) {
           Cx[ x + (i*6 + j)*NN ] += Ax[ x + (i*6 + k)*NN ] * Bx[ x + (k*6 + j)*NN ];
         }
@@ -481,6 +483,11 @@ void plainArray_el16mx_mult66(const float* Ax, const float* Bx, float* Cx) {
     const size_t Nx = x*16*36;
     for (size_t i = 0; i < 6; ++i) {
       for (size_t j = 0; j < 6; ++j) {
+	//
+	for (size_t n = 0; n < 16; ++n) {
+	  Cx[ Nx + (i*6 + j)*16 + n ] = 0.;
+	}
+	//
 	for (size_t k = 0; k < 6; ++k) {
 #pragma omp simd
 	  for (size_t n = 0; n < 16; ++n) {
