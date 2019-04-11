@@ -64,11 +64,11 @@ t0 = time.time()
 Multiply66(A,B,C)
 t1 = time.time()
 
-print t1-t0, (t1-t0)/float(NN)
+print (t1-t0, (t1-t0)/float(NN))
 
 #for i in range(0,36,6): print A[i][0], A[i+1][0], A[i+2][0], A[i+3][0], A[i+4][0], A[i+5][0]
 #for i in range(0,36,6): print B[i][0], B[i+1][0], B[i+2][0], B[i+3][0], B[i+4][0], B[i+5][0]
-for i in range(0,36,6): print C[i][0], C[i+1][0], C[i+2][0], C[i+3][0], C[i+4][0], C[i+5][0]
+for i in range(0,36,6): print (C[i][0], C[i+1][0], C[i+2][0], C[i+3][0], C[i+4][0], C[i+5][0])
 
 ########## second attempt
 
@@ -122,5 +122,5 @@ t0 = time.time()
 Multiply_v2(a,b,c)
 t1 = time.time()
 
-print t1-t0, (t1-t0)/float(NN)
-print c[:,0]
+print (t1-t0, (t1-t0)/float(NN))
+print (c[:,0])
