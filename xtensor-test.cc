@@ -50,9 +50,9 @@ void test_v0(const std::array<xt::xarray<float>, 36>& input, const int type) {
   }
 
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  if (type==1) std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else if (type==2) std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop-tile version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  if (type==1) std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else if (type==2) std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop-tile version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else std::cout << "v0 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
 void test_v1(const std::array<xt::xarray<float>, 36>& input, const int type) {
@@ -91,9 +91,9 @@ void test_v1(const std::array<xt::xarray<float>, 36>& input, const int type) {
   }
 
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  if (type==1) std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else if (type==2) std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  if (type==1) std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else if (type==2) std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else std::cout << "v1 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
 void test_v2(const std::array<xt::xarray<float>, 36>& input, const int type) {
@@ -132,9 +132,9 @@ void test_v2(const std::array<xt::xarray<float>, 36>& input, const int type) {
   }
 
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  if (type==1) std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else if (type==2) std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  if (type==1) std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else if (type==2) std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else std::cout << "v2 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
 void test_v3(const std::array<xt::xarray<float>, 36>& input, const int type) {
@@ -169,10 +169,10 @@ void test_v3(const std::array<xt::xarray<float>, 36>& input, const int type) {
   }
 
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  // if (type==1) std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  // else if (type==2) std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  // if (type==1) std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (loop version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  // else if (type==2) std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s (stack version), i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
   // else
-  std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
 
@@ -223,7 +223,7 @@ void test_plainArray_matrix(const std::array<xt::xarray<float>, 36>& input, cons
             << Cx[(4*6+0)] << "\t" << Cx[(4*6+1)] << "\t" << Cx[(4*6+2)] << "\t" << Cx[(4*6+3)] << "\t" << Cx[(4*6+4)] << "\t" << Cx[(4*6+5)] << std::endl
             << Cx[(5*6+0)] << "\t" << Cx[(5*6+1)] << "\t" << Cx[(5*6+2)] << "\t" << Cx[(5*6+3)] << "\t" << Cx[(5*6+4)] << "\t" << Cx[(5*6+5)] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  std::cout << "plainArray_matrix -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  std::cout << "plainArray_matrix -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 
   delete Ax, Bx, Cx;
 }
@@ -275,7 +275,7 @@ void test_plainArray_element(const std::array<xt::xarray<float>, 36>& input, con
             << Cx[NN*(4*6+0)] << "\t" << Cx[NN*(4*6+1)] << "\t" << Cx[NN*(4*6+2)] << "\t" << Cx[NN*(4*6+3)] << "\t" << Cx[NN*(4*6+4)] << "\t" << Cx[NN*(4*6+5)] << std::endl
             << Cx[NN*(5*6+0)] << "\t" << Cx[NN*(5*6+1)] << "\t" << Cx[NN*(5*6+2)] << "\t" << Cx[NN*(5*6+3)] << "\t" << Cx[NN*(5*6+4)] << "\t" << Cx[NN*(5*6+5)] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  std::cout << "plainArray_element -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  std::cout << "plainArray_element -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 
   delete Ax, Bx, Cx;
 }
@@ -337,8 +337,8 @@ void test_plainArray_el16mx(const std::array<xt::xarray<float>, 36>& input, cons
             << Cx[16*(4*6+0)] << "\t" << Cx[16*(4*6+1)] << "\t" << Cx[16*(4*6+2)] << "\t" << Cx[16*(4*6+3)] << "\t" << Cx[16*(4*6+4)] << "\t" << Cx[16*(4*6+5)] << std::endl
             << Cx[16*(5*6+0)] << "\t" << Cx[16*(5*6+1)] << "\t" << Cx[16*(5*6+2)] << "\t" << Cx[16*(5*6+3)] << "\t" << Cx[16*(5*6+4)] << "\t" << Cx[16*(5*6+5)] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  if (type==1) std::cout << "plainArray_el16mx (mplex loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
-  else std::cout << "plainArray_el16mx (plain loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  if (type==1) std::cout << "plainArray_el16mx (mplex loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else std::cout << "plainArray_el16mx (plain loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
   if (align) {
     _mm_free(Ax);
     _mm_free(Bx);
@@ -406,7 +406,7 @@ void test_plainArray_xsimd(const std::array<xt::xarray<float>, 36>& input) {
             << C[(4*6+0)][0] << "\t" << C[(4*6+1)][0] << "\t" << C[(4*6+2)][0] << "\t" << C[(4*6+3)][0] << "\t" << C[(4*6+4)][0] << "\t" << C[(4*6+5)][0] << std::endl
             << C[(5*6+0)][0] << "\t" << C[(5*6+1)][0] << "\t" << C[(5*6+2)][0] << "\t" << C[(5*6+3)][0] << "\t" << C[(5*6+4)][0] << "\t" << C[(5*6+5)][0] << std::endl;
   float time = float(end-begin)/CLOCKS_PER_SEC;
-  std::cout << "plainArray_xsimd -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per track [s]=" << time/float(NN*nrep) << std::endl;
+  std::cout << "plainArray_xsimd -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -420,16 +420,16 @@ int main(int argc, char* argv[])
   std::cout << "done preparing input" << std::endl;
 
   test_v0(input,0);
-  test_v0(input,1);
-  test_v0(input,2);
+  // test_v0(input,1);
+  // test_v0(input,2);
   std::cout << std::endl;
   test_v1(input,0);
-  test_v1(input,1);
-  // test_v1(input,2);
+  // test_v1(input,1);
+  // // test_v1(input,2);
   std::cout << std::endl;
   test_v2(input,0);
-  test_v2(input,1);
-  // test_v2(input,2);
+  // test_v2(input,1);
+  // // test_v2(input,2);
   std::cout << std::endl;
   test_v3(input,0);
   std::cout << std::endl;
