@@ -117,11 +117,70 @@ public:
     }
   }
   //
- private:
+private:
   //
   xt::xtensor_fixed<float, xt::xshape<NN,36>, xt::layout_type::column_major>* m_;
 };
 
+class MatriplXT66_v4
+{
+  //
+public:
+  MatriplXT66_v4() { m_ = new xt::xtensor_fixed<float, xt::xshape<NN,36>, xt::layout_type::column_major>(); }
+  ~MatriplXT66_v4() {delete m_;}
+  //
+  auto operator[] (size_t k) { return xt::view(*m_,xt::all(),k); }
+  const auto operator[] (size_t k) const { return xt::view(*m_,xt::all(),k); }
+  //
+  //
+  auto operator() (size_t k, size_t v) { return xt::view((*m_),xt::range(v*VV,(v+1)*VV),k); }
+  const auto operator() (size_t k, size_t v) const { return xt::view((*m_),xt::range(v*VV,(v+1)*VV),k); }
+  //
+  float operator() (size_t i, size_t j, size_t n) const { return (*m_)(n,i * 6 + j); }
+  void print(std::ostream& os, size_t n)
+  {
+    for (size_t i=0; i<6; i++) {
+      for (size_t j=0; j<6; j++) {
+        os << (*m_)(n,i * 6 + j) << "\t";
+      }
+      os << std::endl;
+    }
+  }
+  //
+private:
+  //
+  xt::xtensor_fixed<float, xt::xshape<NN,36>, xt::layout_type::column_major>* m_;
+};
+
+class MatriplXT66_v5
+{
+  //
+public:
+  MatriplXT66_v5() { m_ = new xt::xtensor_fixed<float, xt::xshape<VV,NN/VV,36>, xt::layout_type::column_major>(); }
+  ~MatriplXT66_v5() {delete m_;}
+  //
+  auto operator[] (size_t k) { return xt::view(*m_,xt::all(),xt::all(),k); }
+  const auto operator[] (size_t k) const { return xt::view(*m_,xt::all(),xt::all(),k); }
+  //
+  //
+  auto operator() (size_t k, size_t v) { return xt::view((*m_),xt::all(),v,k); }
+  const auto operator() (size_t k, size_t v) const { return xt::view((*m_),xt::all(),v,k); }
+  //
+  float operator() (size_t i, size_t j, size_t n) const { return (*m_)(n%VV,(size_t)(n/VV),i * 6 + j); }
+  void print(std::ostream& os, size_t n)
+  {
+    for (size_t i=0; i<6; i++) {
+      for (size_t j=0; j<6; j++) {
+        os << (*m_)(n,i * 6 + j) << "\t";
+      }
+      os << std::endl;
+    }
+  }
+  //
+private:
+  //
+  xt::xtensor_fixed<float, xt::xshape<VV,NN/VV,36>, xt::layout_type::column_major>* m_;
+};
 
 void MultiplyXT66(const MatriplXT66& A,
                   const MatriplXT66& B,
@@ -289,6 +348,95 @@ void MultiplyXT66(const MatriplXT66_v3& A,
   C[33] = A[30]*B[ 3] + A[31]*B[ 9] + A[32]*B[15] + A[33]*B[21] + A[34]*B[27] + A[35]*B[33];
   C[34] = A[30]*B[ 4] + A[31]*B[10] + A[32]*B[16] + A[33]*B[22] + A[34]*B[28] + A[35]*B[34];
   C[35] = A[30]*B[ 5] + A[31]*B[11] + A[32]*B[17] + A[33]*B[23] + A[34]*B[29] + A[35]*B[35];
+}
+
+void MultiplyXT66(const MatriplXT66_v4& A,
+                  const MatriplXT66_v4& B,
+		        MatriplXT66_v4& C)
+{
+  const size_t nv = NN/VV;
+  for (size_t v = 0; v < nv; ++v) {
+    C( 0,v) = A( 0,v)*B( 0,v) + A( 1,v)*B( 6,v) + A( 2,v)*B(12,v) + A( 3,v)*B(18,v) + A( 4,v)*B(24,v) + A( 5,v)*B(30,v);
+    C( 1,v) = A( 0,v)*B( 1,v) + A( 1,v)*B( 7,v) + A( 2,v)*B(13,v) + A( 3,v)*B(19,v) + A( 4,v)*B(25,v) + A( 5,v)*B(31,v);
+    C( 2,v) = A( 0,v)*B( 2,v) + A( 1,v)*B( 8,v) + A( 2,v)*B(14,v) + A( 3,v)*B(20,v) + A( 4,v)*B(26,v) + A( 5,v)*B(32,v);
+    C( 3,v) = A( 0,v)*B( 3,v) + A( 1,v)*B( 9,v) + A( 2,v)*B(15,v) + A( 3,v)*B(21,v) + A( 4,v)*B(27,v) + A( 5,v)*B(33,v);
+    C( 4,v) = A( 0,v)*B( 4,v) + A( 1,v)*B(10,v) + A( 2,v)*B(16,v) + A( 3,v)*B(22,v) + A( 4,v)*B(28,v) + A( 5,v)*B(34,v);
+    C( 5,v) = A( 0,v)*B( 5,v) + A( 1,v)*B(11,v) + A( 2,v)*B(17,v) + A( 3,v)*B(23,v) + A( 4,v)*B(29,v) + A( 5,v)*B(35,v);
+    C( 6,v) = A( 6,v)*B( 0,v) + A( 7,v)*B( 6,v) + A( 8,v)*B(12,v) + A( 9,v)*B(18,v) + A(10,v)*B(24,v) + A(11,v)*B(30,v);
+    C( 7,v) = A( 6,v)*B( 1,v) + A( 7,v)*B( 7,v) + A( 8,v)*B(13,v) + A( 9,v)*B(19,v) + A(10,v)*B(25,v) + A(11,v)*B(31,v);
+    C( 8,v) = A( 6,v)*B( 2,v) + A( 7,v)*B( 8,v) + A( 8,v)*B(14,v) + A( 9,v)*B(20,v) + A(10,v)*B(26,v) + A(11,v)*B(32,v);
+    C( 9,v) = A( 6,v)*B( 3,v) + A( 7,v)*B( 9,v) + A( 8,v)*B(15,v) + A( 9,v)*B(21,v) + A(10,v)*B(27,v) + A(11,v)*B(33,v);
+    C(10,v) = A( 6,v)*B( 4,v) + A( 7,v)*B(10,v) + A( 8,v)*B(16,v) + A( 9,v)*B(22,v) + A(10,v)*B(28,v) + A(11,v)*B(34,v);
+    C(11,v) = A( 6,v)*B( 5,v) + A( 7,v)*B(11,v) + A( 8,v)*B(17,v) + A( 9,v)*B(23,v) + A(10,v)*B(29,v) + A(11,v)*B(35,v);
+    C(12,v) = A(12,v)*B( 0,v) + A(13,v)*B( 6,v) + A(14,v)*B(12,v) + A(15,v)*B(18,v) + A(16,v)*B(24,v) + A(17,v)*B(30,v);
+    C(13,v) = A(12,v)*B( 1,v) + A(13,v)*B( 7,v) + A(14,v)*B(13,v) + A(15,v)*B(19,v) + A(16,v)*B(25,v) + A(17,v)*B(31,v);
+    C(14,v) = A(12,v)*B( 2,v) + A(13,v)*B( 8,v) + A(14,v)*B(14,v) + A(15,v)*B(20,v) + A(16,v)*B(26,v) + A(17,v)*B(32,v);
+    C(15,v) = A(12,v)*B( 3,v) + A(13,v)*B( 9,v) + A(14,v)*B(15,v) + A(15,v)*B(21,v) + A(16,v)*B(27,v) + A(17,v)*B(33,v);
+    C(16,v) = A(12,v)*B( 4,v) + A(13,v)*B(10,v) + A(14,v)*B(16,v) + A(15,v)*B(22,v) + A(16,v)*B(28,v) + A(17,v)*B(34,v);
+    C(17,v) = A(12,v)*B( 5,v) + A(13,v)*B(11,v) + A(14,v)*B(17,v) + A(15,v)*B(23,v) + A(16,v)*B(29,v) + A(17,v)*B(35,v);
+    C(18,v) = A(18,v)*B( 0,v) + A(19,v)*B( 6,v) + A(20,v)*B(12,v) + A(21,v)*B(18,v) + A(22,v)*B(24,v) + A(23,v)*B(30,v);
+    C(19,v) = A(18,v)*B( 1,v) + A(19,v)*B( 7,v) + A(20,v)*B(13,v) + A(21,v)*B(19,v) + A(22,v)*B(25,v) + A(23,v)*B(31,v);
+    C(20,v) = A(18,v)*B( 2,v) + A(19,v)*B( 8,v) + A(20,v)*B(14,v) + A(21,v)*B(20,v) + A(22,v)*B(26,v) + A(23,v)*B(32,v);
+    C(21,v) = A(18,v)*B( 3,v) + A(19,v)*B( 9,v) + A(20,v)*B(15,v) + A(21,v)*B(21,v) + A(22,v)*B(27,v) + A(23,v)*B(33,v);
+    C(22,v) = A(18,v)*B( 4,v) + A(19,v)*B(10,v) + A(20,v)*B(16,v) + A(21,v)*B(22,v) + A(22,v)*B(28,v) + A(23,v)*B(34,v);
+    C(23,v) = A(18,v)*B( 5,v) + A(19,v)*B(11,v) + A(20,v)*B(17,v) + A(21,v)*B(23,v) + A(22,v)*B(29,v) + A(23,v)*B(35,v);
+    C(24,v) = A(24,v)*B( 0,v) + A(25,v)*B( 6,v) + A(26,v)*B(12,v) + A(27,v)*B(18,v) + A(28,v)*B(24,v) + A(29,v)*B(30,v);
+    C(25,v) = A(24,v)*B( 1,v) + A(25,v)*B( 7,v) + A(26,v)*B(13,v) + A(27,v)*B(19,v) + A(28,v)*B(25,v) + A(29,v)*B(31,v);
+    C(26,v) = A(24,v)*B( 2,v) + A(25,v)*B( 8,v) + A(26,v)*B(14,v) + A(27,v)*B(20,v) + A(28,v)*B(26,v) + A(29,v)*B(32,v);
+    C(27,v) = A(24,v)*B( 3,v) + A(25,v)*B( 9,v) + A(26,v)*B(15,v) + A(27,v)*B(21,v) + A(28,v)*B(27,v) + A(29,v)*B(33,v);
+    C(28,v) = A(24,v)*B( 4,v) + A(25,v)*B(10,v) + A(26,v)*B(16,v) + A(27,v)*B(22,v) + A(28,v)*B(28,v) + A(29,v)*B(34,v);
+    C(29,v) = A(24,v)*B( 5,v) + A(25,v)*B(11,v) + A(26,v)*B(17,v) + A(27,v)*B(23,v) + A(28,v)*B(29,v) + A(29,v)*B(35,v);
+    C(30,v) = A(30,v)*B( 0,v) + A(31,v)*B( 6,v) + A(32,v)*B(12,v) + A(33,v)*B(18,v) + A(34,v)*B(24,v) + A(35,v)*B(30,v);
+    C(31,v) = A(30,v)*B( 1,v) + A(31,v)*B( 7,v) + A(32,v)*B(13,v) + A(33,v)*B(19,v) + A(34,v)*B(25,v) + A(35,v)*B(31,v);
+    C(32,v) = A(30,v)*B( 2,v) + A(31,v)*B( 8,v) + A(32,v)*B(14,v) + A(33,v)*B(20,v) + A(34,v)*B(26,v) + A(35,v)*B(32,v);
+    C(33,v) = A(30,v)*B( 3,v) + A(31,v)*B( 9,v) + A(32,v)*B(15,v) + A(33,v)*B(21,v) + A(34,v)*B(27,v) + A(35,v)*B(33,v);
+    C(34,v) = A(30,v)*B( 4,v) + A(31,v)*B(10,v) + A(32,v)*B(16,v) + A(33,v)*B(22,v) + A(34,v)*B(28,v) + A(35,v)*B(34,v);
+    C(35,v) = A(30,v)*B( 5,v) + A(31,v)*B(11,v) + A(32,v)*B(17,v) + A(33,v)*B(23,v) + A(34,v)*B(29,v) + A(35,v)*B(35,v);
+  }
+}
+void MultiplyXT66(const MatriplXT66_v5& A,
+                  const MatriplXT66_v5& B,
+		        MatriplXT66_v5& C)
+{
+  const size_t nv = NN/VV;
+  for (size_t v = 0; v < nv; ++v) {
+    C( 0,v) = A( 0,v)*B( 0,v) + A( 1,v)*B( 6,v) + A( 2,v)*B(12,v) + A( 3,v)*B(18,v) + A( 4,v)*B(24,v) + A( 5,v)*B(30,v);
+    C( 1,v) = A( 0,v)*B( 1,v) + A( 1,v)*B( 7,v) + A( 2,v)*B(13,v) + A( 3,v)*B(19,v) + A( 4,v)*B(25,v) + A( 5,v)*B(31,v);
+    C( 2,v) = A( 0,v)*B( 2,v) + A( 1,v)*B( 8,v) + A( 2,v)*B(14,v) + A( 3,v)*B(20,v) + A( 4,v)*B(26,v) + A( 5,v)*B(32,v);
+    C( 3,v) = A( 0,v)*B( 3,v) + A( 1,v)*B( 9,v) + A( 2,v)*B(15,v) + A( 3,v)*B(21,v) + A( 4,v)*B(27,v) + A( 5,v)*B(33,v);
+    C( 4,v) = A( 0,v)*B( 4,v) + A( 1,v)*B(10,v) + A( 2,v)*B(16,v) + A( 3,v)*B(22,v) + A( 4,v)*B(28,v) + A( 5,v)*B(34,v);
+    C( 5,v) = A( 0,v)*B( 5,v) + A( 1,v)*B(11,v) + A( 2,v)*B(17,v) + A( 3,v)*B(23,v) + A( 4,v)*B(29,v) + A( 5,v)*B(35,v);
+    C( 6,v) = A( 6,v)*B( 0,v) + A( 7,v)*B( 6,v) + A( 8,v)*B(12,v) + A( 9,v)*B(18,v) + A(10,v)*B(24,v) + A(11,v)*B(30,v);
+    C( 7,v) = A( 6,v)*B( 1,v) + A( 7,v)*B( 7,v) + A( 8,v)*B(13,v) + A( 9,v)*B(19,v) + A(10,v)*B(25,v) + A(11,v)*B(31,v);
+    C( 8,v) = A( 6,v)*B( 2,v) + A( 7,v)*B( 8,v) + A( 8,v)*B(14,v) + A( 9,v)*B(20,v) + A(10,v)*B(26,v) + A(11,v)*B(32,v);
+    C( 9,v) = A( 6,v)*B( 3,v) + A( 7,v)*B( 9,v) + A( 8,v)*B(15,v) + A( 9,v)*B(21,v) + A(10,v)*B(27,v) + A(11,v)*B(33,v);
+    C(10,v) = A( 6,v)*B( 4,v) + A( 7,v)*B(10,v) + A( 8,v)*B(16,v) + A( 9,v)*B(22,v) + A(10,v)*B(28,v) + A(11,v)*B(34,v);
+    C(11,v) = A( 6,v)*B( 5,v) + A( 7,v)*B(11,v) + A( 8,v)*B(17,v) + A( 9,v)*B(23,v) + A(10,v)*B(29,v) + A(11,v)*B(35,v);
+    C(12,v) = A(12,v)*B( 0,v) + A(13,v)*B( 6,v) + A(14,v)*B(12,v) + A(15,v)*B(18,v) + A(16,v)*B(24,v) + A(17,v)*B(30,v);
+    C(13,v) = A(12,v)*B( 1,v) + A(13,v)*B( 7,v) + A(14,v)*B(13,v) + A(15,v)*B(19,v) + A(16,v)*B(25,v) + A(17,v)*B(31,v);
+    C(14,v) = A(12,v)*B( 2,v) + A(13,v)*B( 8,v) + A(14,v)*B(14,v) + A(15,v)*B(20,v) + A(16,v)*B(26,v) + A(17,v)*B(32,v);
+    C(15,v) = A(12,v)*B( 3,v) + A(13,v)*B( 9,v) + A(14,v)*B(15,v) + A(15,v)*B(21,v) + A(16,v)*B(27,v) + A(17,v)*B(33,v);
+    C(16,v) = A(12,v)*B( 4,v) + A(13,v)*B(10,v) + A(14,v)*B(16,v) + A(15,v)*B(22,v) + A(16,v)*B(28,v) + A(17,v)*B(34,v);
+    C(17,v) = A(12,v)*B( 5,v) + A(13,v)*B(11,v) + A(14,v)*B(17,v) + A(15,v)*B(23,v) + A(16,v)*B(29,v) + A(17,v)*B(35,v);
+    C(18,v) = A(18,v)*B( 0,v) + A(19,v)*B( 6,v) + A(20,v)*B(12,v) + A(21,v)*B(18,v) + A(22,v)*B(24,v) + A(23,v)*B(30,v);
+    C(19,v) = A(18,v)*B( 1,v) + A(19,v)*B( 7,v) + A(20,v)*B(13,v) + A(21,v)*B(19,v) + A(22,v)*B(25,v) + A(23,v)*B(31,v);
+    C(20,v) = A(18,v)*B( 2,v) + A(19,v)*B( 8,v) + A(20,v)*B(14,v) + A(21,v)*B(20,v) + A(22,v)*B(26,v) + A(23,v)*B(32,v);
+    C(21,v) = A(18,v)*B( 3,v) + A(19,v)*B( 9,v) + A(20,v)*B(15,v) + A(21,v)*B(21,v) + A(22,v)*B(27,v) + A(23,v)*B(33,v);
+    C(22,v) = A(18,v)*B( 4,v) + A(19,v)*B(10,v) + A(20,v)*B(16,v) + A(21,v)*B(22,v) + A(22,v)*B(28,v) + A(23,v)*B(34,v);
+    C(23,v) = A(18,v)*B( 5,v) + A(19,v)*B(11,v) + A(20,v)*B(17,v) + A(21,v)*B(23,v) + A(22,v)*B(29,v) + A(23,v)*B(35,v);
+    C(24,v) = A(24,v)*B( 0,v) + A(25,v)*B( 6,v) + A(26,v)*B(12,v) + A(27,v)*B(18,v) + A(28,v)*B(24,v) + A(29,v)*B(30,v);
+    C(25,v) = A(24,v)*B( 1,v) + A(25,v)*B( 7,v) + A(26,v)*B(13,v) + A(27,v)*B(19,v) + A(28,v)*B(25,v) + A(29,v)*B(31,v);
+    C(26,v) = A(24,v)*B( 2,v) + A(25,v)*B( 8,v) + A(26,v)*B(14,v) + A(27,v)*B(20,v) + A(28,v)*B(26,v) + A(29,v)*B(32,v);
+    C(27,v) = A(24,v)*B( 3,v) + A(25,v)*B( 9,v) + A(26,v)*B(15,v) + A(27,v)*B(21,v) + A(28,v)*B(27,v) + A(29,v)*B(33,v);
+    C(28,v) = A(24,v)*B( 4,v) + A(25,v)*B(10,v) + A(26,v)*B(16,v) + A(27,v)*B(22,v) + A(28,v)*B(28,v) + A(29,v)*B(34,v);
+    C(29,v) = A(24,v)*B( 5,v) + A(25,v)*B(11,v) + A(26,v)*B(17,v) + A(27,v)*B(23,v) + A(28,v)*B(29,v) + A(29,v)*B(35,v);
+    C(30,v) = A(30,v)*B( 0,v) + A(31,v)*B( 6,v) + A(32,v)*B(12,v) + A(33,v)*B(18,v) + A(34,v)*B(24,v) + A(35,v)*B(30,v);
+    C(31,v) = A(30,v)*B( 1,v) + A(31,v)*B( 7,v) + A(32,v)*B(13,v) + A(33,v)*B(19,v) + A(34,v)*B(25,v) + A(35,v)*B(31,v);
+    C(32,v) = A(30,v)*B( 2,v) + A(31,v)*B( 8,v) + A(32,v)*B(14,v) + A(33,v)*B(20,v) + A(34,v)*B(26,v) + A(35,v)*B(32,v);
+    C(33,v) = A(30,v)*B( 3,v) + A(31,v)*B( 9,v) + A(32,v)*B(15,v) + A(33,v)*B(21,v) + A(34,v)*B(27,v) + A(35,v)*B(33,v);
+    C(34,v) = A(30,v)*B( 4,v) + A(31,v)*B(10,v) + A(32,v)*B(16,v) + A(33,v)*B(22,v) + A(34,v)*B(28,v) + A(35,v)*B(34,v);
+    C(35,v) = A(30,v)*B( 5,v) + A(31,v)*B(11,v) + A(32,v)*B(17,v) + A(33,v)*B(23,v) + A(34,v)*B(29,v) + A(35,v)*B(35,v);
+  }
 }
 
 void MultiplyXT66LoopTile(const MatriplXT66& A,
@@ -499,6 +647,27 @@ void plainArray_el16mx_mult66(const float* Ax, const float* Bx, float* Cx) {
   }
 }
 
+void plainArray_elVVmx_mult66(const float* Ax, const float* Bx, float* Cx) {
+  for (size_t x = 0; x < NN/VV; ++x) {
+    const size_t Nx = x*VV*36;
+    for (size_t i = 0; i < 6; ++i) {
+      for (size_t j = 0; j < 6; ++j) {
+	//
+	for (size_t n = 0; n < VV; ++n) {
+	  Cx[ Nx + (i*6 + j)*VV + n ] = 0.;
+	}
+	//
+	for (size_t k = 0; k < 6; ++k) {
+#pragma omp simd
+	  for (size_t n = 0; n < VV; ++n) {
+	    Cx[ Nx + (i*6 + j)*VV + n ] += Ax[ Nx + (i*6 + k)*VV + n ] * Bx[ Nx + (k*6 + j)*VV + n];
+	  }
+	}
+      }
+    }
+  }
+}
+
 void plainArray_el16mx_mult66_v1(const float* Ax, const float* Bx, float* Cx) {
   for (size_t x = 0; x < NN/16; ++x) {
     const size_t Nx = x*16*36;
@@ -540,6 +709,50 @@ void plainArray_el16mx_mult66_v1(const float* Ax, const float* Bx, float* Cx) {
       Cx[Nx+16*33+n] = Ax[Nx+16*30+n]*Bx[Nx+16* 3+n] + Ax[Nx+16*31+n]*Bx[Nx+16* 9+n] + Ax[Nx+16*32+n]*Bx[Nx+16*15+n] + Ax[Nx+16*33+n]*Bx[Nx+16*21+n] + Ax[Nx+16*34+n]*Bx[Nx+16*27+n] + Ax[Nx+16*35+n]*Bx[Nx+16*33+n];
       Cx[Nx+16*34+n] = Ax[Nx+16*30+n]*Bx[Nx+16* 4+n] + Ax[Nx+16*31+n]*Bx[Nx+16*10+n] + Ax[Nx+16*32+n]*Bx[Nx+16*16+n] + Ax[Nx+16*33+n]*Bx[Nx+16*22+n] + Ax[Nx+16*34+n]*Bx[Nx+16*28+n] + Ax[Nx+16*35+n]*Bx[Nx+16*34+n];
       Cx[Nx+16*35+n] = Ax[Nx+16*30+n]*Bx[Nx+16* 5+n] + Ax[Nx+16*31+n]*Bx[Nx+16*11+n] + Ax[Nx+16*32+n]*Bx[Nx+16*17+n] + Ax[Nx+16*33+n]*Bx[Nx+16*23+n] + Ax[Nx+16*34+n]*Bx[Nx+16*29+n] + Ax[Nx+16*35+n]*Bx[Nx+16*35+n];
+    }
+  }
+}
+void plainArray_elVVmx_mult66_v1(const float* Ax, const float* Bx, float* Cx) {
+  for (size_t x = 0; x < NN/VV; ++x) {
+    const size_t Nx = x*VV*36;
+#pragma omp simd
+    for (size_t n = 0; n < VV; ++n) {
+      Cx[Nx+VV* 0+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV* 1+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV* 2+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV* 3+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV* 4+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV* 5+n] = Ax[Nx+VV* 0+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV* 1+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV* 2+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV* 3+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV* 4+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV* 5+n]*Bx[Nx+VV*35+n];
+      Cx[Nx+VV* 6+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV* 7+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV* 8+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV* 9+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV*10+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV*11+n] = Ax[Nx+VV* 6+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV* 7+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV* 8+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV* 9+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV*10+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV*11+n]*Bx[Nx+VV*35+n];
+      Cx[Nx+VV*12+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV*13+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV*14+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV*15+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV*16+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV*17+n] = Ax[Nx+VV*12+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV*13+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV*14+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV*15+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV*16+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV*17+n]*Bx[Nx+VV*35+n];
+      Cx[Nx+VV*18+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV*19+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV*20+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV*21+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV*22+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV*23+n] = Ax[Nx+VV*18+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV*19+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV*20+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV*21+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV*22+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV*23+n]*Bx[Nx+VV*35+n];
+      Cx[Nx+VV*24+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV*25+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV*26+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV*27+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV*28+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV*29+n] = Ax[Nx+VV*24+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV*25+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV*26+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV*27+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV*28+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV*29+n]*Bx[Nx+VV*35+n];
+      Cx[Nx+VV*30+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 0+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV* 6+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*12+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*18+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*24+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*30+n];
+      Cx[Nx+VV*31+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 1+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV* 7+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*13+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*19+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*25+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*31+n];
+      Cx[Nx+VV*32+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 2+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV* 8+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*14+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*20+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*26+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*32+n];
+      Cx[Nx+VV*33+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 3+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV* 9+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*15+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*21+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*27+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*33+n];
+      Cx[Nx+VV*34+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 4+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV*10+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*16+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*22+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*28+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*34+n];
+      Cx[Nx+VV*35+n] = Ax[Nx+VV*30+n]*Bx[Nx+VV* 5+n] + Ax[Nx+VV*31+n]*Bx[Nx+VV*11+n] + Ax[Nx+VV*32+n]*Bx[Nx+VV*17+n] + Ax[Nx+VV*33+n]*Bx[Nx+VV*23+n] + Ax[Nx+VV*34+n]*Bx[Nx+VV*29+n] + Ax[Nx+VV*35+n]*Bx[Nx+VV*35+n];
     }
   }
 }

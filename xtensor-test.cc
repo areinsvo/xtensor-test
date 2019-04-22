@@ -5,7 +5,14 @@
 #include "xtensor/xrandom.hpp"
 #include <time.h>
 
+// choose NN and VV to be multiples of 64 (for vectorization) 
+// choose VV so that subtensors of B fit into a given cache level
+// for tiling L1d, 32*1024 / (36*4) = 227 => VV = 192
+// for tiling L2, 1024*1024 / (36*4) = 7281 => VV = 6400
+// tiling L2 seems to be more effective for xtensor
+
 constexpr size_t NN = 16*600000;//10000000;
+constexpr size_t VV=6400;
 constexpr size_t nrep = 10;
 
 #include "MatriplXT.h"
@@ -175,6 +182,83 @@ void test_v3(const std::array<xt::xarray<float>, 36>& input, const int type) {
   std::cout << "v3 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
 }
 
+void test_v4(const std::array<xt::xarray<float>, 36>& input, const int type) {
+
+  MatriplXT66_v4 A;
+  for (size_t i=0;i<36;++i) A[i] = input[i];
+
+  MatriplXT66_v4 B;
+  for (size_t i=0;i<36;++i) B[i] = input[i]+0.5;
+
+  MatriplXT66_v4 C;
+  for (size_t i=0;i<36;++i) C[i] = xt::zeros<float>({NN});
+
+  //dry run, not timed
+  MultiplyXT66(A, B, C);
+
+  //timed run, repeated nrep times
+  const clock_t begin = clock();
+  for (size_t nit=0; nit<nrep; ++nit) {
+     MultiplyXT66(A, B, C);
+  }
+  const clock_t end = clock();
+
+  for (size_t nn=0; nn<1/*NN*/; nn++) {
+    // std::cout << "nn=" << nn << std::endl;
+    // std::cout << "A" << std::endl;
+    // A.print(std::cout,nn);
+    // std::cout << "B" << std::endl;
+    // B.print(std::cout,nn);
+    std::cout << "C" << std::endl;
+    C.print(std::cout,nn);
+  }
+
+  float time = float(end-begin)/CLOCKS_PER_SEC;
+  std::cout << "v4 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+}
+
+void test_v5(const std::array<xt::xarray<float>, 36>& input, const int type) {
+
+  MatriplXT66_v5 A;
+  for (size_t i=0;i<36;++i) {
+    for (size_t v=0;v<NN/VV;++v) {
+      A(i,v) = xt::view(input[i],xt::range(v*VV,(v+1)*VV));
+    }
+  }
+
+  MatriplXT66_v5 B;
+  for (size_t i=0;i<36;++i) {
+    for (size_t v=0;v<NN/VV;++v) {
+      B(i,v) = xt::view(input[i],xt::range(v*VV,(v+1)*VV)) + 0.5;
+    }
+  }
+
+  MatriplXT66_v5 C;
+  for (size_t i=0;i<36;++i) C[i] = xt::zeros<float>({VV,NN/VV});
+
+  //dry run, not timed
+  MultiplyXT66(A, B, C);
+
+  //timed run, repeated nrep times
+  const clock_t begin = clock();
+  for (size_t nit=0; nit<nrep; ++nit) {
+     MultiplyXT66(A, B, C);
+  }
+  const clock_t end = clock();
+
+  for (size_t nn=0; nn<1/*NN*/; nn++) {
+    // std::cout << "nn=" << nn << std::endl;
+    // std::cout << "A" << std::endl;
+    // A.print(std::cout,nn);
+    // std::cout << "B" << std::endl;
+    // B.print(std::cout,nn);
+    std::cout << "C" << std::endl;
+    C.print(std::cout,nn);
+  }
+
+  float time = float(end-begin)/CLOCKS_PER_SEC;
+  std::cout << "v5 -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+}
 
 void test_plainArray_matrix(const std::array<xt::xarray<float>, 36>& input, const int type) {
   //
@@ -348,6 +432,74 @@ void test_plainArray_el16mx(const std::array<xt::xarray<float>, 36>& input, cons
   }
 }
 
+void test_plainArray_elVVmx(const std::array<xt::xarray<float>, 36>& input, const int type, bool align) {
+  //
+  float* Ax = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
+  float* Bx = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
+  float* Cx = (align ? (float*) _mm_malloc(36*NN*sizeof(float), 64) : new float[NN*36]);
+  for (size_t j=0;j<NN*36;++j) Cx[j]=0.;
+  //
+  // store in element order for bunches of VV matrices (a la matriplex)
+  for (size_t x=0;x<NN/VV;++x) {
+    for (size_t i=0;i<36;++i) {
+      for (size_t n=0;n<VV;++n) {
+        Ax[n + i*VV + VV*36*x] = input[i](n+VV*x);
+        Bx[n + i*VV + VV*36*x] = input[i](n+VV*x)+0.5;
+      }
+    }
+  }
+
+  //dry run, not timed
+  if (type==1) {
+    plainArray_elVVmx_mult66_v1(Ax,Bx,Cx);
+  } else {
+    plainArray_elVVmx_mult66(Ax,Bx,Cx);
+  }
+
+  //timed run, repeated nrep times
+  const clock_t begin = clock();
+  for (size_t nit=0; nit<nrep; ++nit) {
+    if (type==1) {
+      plainArray_elVVmx_mult66_v1(Ax,Bx,Cx);
+    } else {
+      plainArray_elVVmx_mult66(Ax,Bx,Cx);
+    }
+  }
+  const clock_t end = clock();
+
+  // std::cout << "Ax=" << std::endl
+  //        << Ax[VV*(0*6+0)] << "\t" << Ax[VV*(0*6+1)] << "\t" << Ax[VV*(0*6+2)] << "\t" << Ax[VV*(0*6+3)] << "\t" << Ax[VV*(0*6+4)] << "\t" << Ax[VV*(0*6+5)] << std::endl
+  //        << Ax[VV*(1*6+0)] << "\t" << Ax[VV*(1*6+1)] << "\t" << Ax[VV*(1*6+2)] << "\t" << Ax[VV*(1*6+3)] << "\t" << Ax[VV*(1*6+4)] << "\t" << Ax[VV*(1*6+5)] << std::endl
+  //        << Ax[VV*(2*6+0)] << "\t" << Ax[VV*(2*6+1)] << "\t" << Ax[VV*(2*6+2)] << "\t" << Ax[VV*(2*6+3)] << "\t" << Ax[VV*(2*6+4)] << "\t" << Ax[VV*(2*6+5)] << std::endl
+  //        << Ax[VV*(3*6+0)] << "\t" << Ax[VV*(3*6+1)] << "\t" << Ax[VV*(3*6+2)] << "\t" << Ax[VV*(3*6+3)] << "\t" << Ax[VV*(3*6+4)] << "\t" << Ax[VV*(3*6+5)] << std::endl
+  //        << Ax[VV*(4*6+0)] << "\t" << Ax[VV*(4*6+1)] << "\t" << Ax[VV*(4*6+2)] << "\t" << Ax[VV*(4*6+3)] << "\t" << Ax[VV*(4*6+4)] << "\t" << Ax[VV*(4*6+5)] << std::endl
+  //        << Ax[VV*(5*6+0)] << "\t" << Ax[VV*(5*6+1)] << "\t" << Ax[VV*(5*6+2)] << "\t" << Ax[VV*(5*6+3)] << "\t" << Ax[VV*(5*6+4)] << "\t" << Ax[VV*(5*6+5)] << std::endl;
+  // std::cout << "Bx=" << std::endl
+  //        << Bx[VV*(0*6+0)] << "\t" << Bx[VV*(0*6+1)] << "\t" << Bx[VV*(0*6+2)] << "\t" << Bx[VV*(0*6+3)] << "\t" << Bx[VV*(0*6+4)] << "\t" << Bx[VV*(0*6+5)] << std::endl
+  //        << Bx[VV*(1*6+0)] << "\t" << Bx[VV*(1*6+1)] << "\t" << Bx[VV*(1*6+2)] << "\t" << Bx[VV*(1*6+3)] << "\t" << Bx[VV*(1*6+4)] << "\t" << Bx[VV*(1*6+5)] << std::endl
+  //        << Bx[VV*(2*6+0)] << "\t" << Bx[VV*(2*6+1)] << "\t" << Bx[VV*(2*6+2)] << "\t" << Bx[VV*(2*6+3)] << "\t" << Bx[VV*(2*6+4)] << "\t" << Bx[VV*(2*6+5)] << std::endl
+  //        << Bx[VV*(3*6+0)] << "\t" << Bx[VV*(3*6+1)] << "\t" << Bx[VV*(3*6+2)] << "\t" << Bx[VV*(3*6+3)] << "\t" << Bx[VV*(3*6+4)] << "\t" << Bx[VV*(3*6+5)] << std::endl
+  //        << Bx[VV*(4*6+0)] << "\t" << Bx[VV*(4*6+1)] << "\t" << Bx[VV*(4*6+2)] << "\t" << Bx[VV*(4*6+3)] << "\t" << Bx[VV*(4*6+4)] << "\t" << Bx[VV*(4*6+5)] << std::endl
+  //        << Bx[VV*(5*6+0)] << "\t" << Bx[VV*(5*6+1)] << "\t" << Bx[VV*(5*6+2)] << "\t" << Bx[VV*(5*6+3)] << "\t" << Bx[VV*(5*6+4)] << "\t" << Bx[VV*(5*6+5)] << std::endl;
+  std::cout << "Cx=" << std::endl
+            << Cx[VV*(0*6+0)] << "\t" << Cx[VV*(0*6+1)] << "\t" << Cx[VV*(0*6+2)] << "\t" << Cx[VV*(0*6+3)] << "\t" << Cx[VV*(0*6+4)] << "\t" << Cx[VV*(0*6+5)] << std::endl
+            << Cx[VV*(1*6+0)] << "\t" << Cx[VV*(1*6+1)] << "\t" << Cx[VV*(1*6+2)] << "\t" << Cx[VV*(1*6+3)] << "\t" << Cx[VV*(1*6+4)] << "\t" << Cx[VV*(1*6+5)] << std::endl
+            << Cx[VV*(2*6+0)] << "\t" << Cx[VV*(2*6+1)] << "\t" << Cx[VV*(2*6+2)] << "\t" << Cx[VV*(2*6+3)] << "\t" << Cx[VV*(2*6+4)] << "\t" << Cx[VV*(2*6+5)] << std::endl
+            << Cx[VV*(3*6+0)] << "\t" << Cx[VV*(3*6+1)] << "\t" << Cx[VV*(3*6+2)] << "\t" << Cx[VV*(3*6+3)] << "\t" << Cx[VV*(3*6+4)] << "\t" << Cx[VV*(3*6+5)] << std::endl
+            << Cx[VV*(4*6+0)] << "\t" << Cx[VV*(4*6+1)] << "\t" << Cx[VV*(4*6+2)] << "\t" << Cx[VV*(4*6+3)] << "\t" << Cx[VV*(4*6+4)] << "\t" << Cx[VV*(4*6+5)] << std::endl
+            << Cx[VV*(5*6+0)] << "\t" << Cx[VV*(5*6+1)] << "\t" << Cx[VV*(5*6+2)] << "\t" << Cx[VV*(5*6+3)] << "\t" << Cx[VV*(5*6+4)] << "\t" << Cx[VV*(5*6+5)] << std::endl;
+  float time = float(end-begin)/CLOCKS_PER_SEC;
+  if (type==1) std::cout << "plainArray_elVVmx (mplex loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  else std::cout << "plainArray_elVVmx (plain loop) with align=" << align << " -- time for NN*nrep=" << NN*nrep << " multiplications is " << time << " s, i.e. per mult. [s]=" << time/float(NN*nrep) << std::endl;
+  if (align) {
+    _mm_free(Ax);
+    _mm_free(Bx);
+    _mm_free(Cx);
+  } else {
+    delete Ax, Bx, Cx;
+  }
+}
+
 
 void test_plainArray_xsimd(const std::array<xt::xarray<float>, 36>& input) {
   //
@@ -412,16 +564,25 @@ void test_plainArray_xsimd(const std::array<xt::xarray<float>, 36>& input) {
 int main(int argc, char* argv[])
 {
 
-  std::cout << "running with NN=" << NN << " nrep=" << nrep << std::endl;
+  std::cout << "running with NN=" << NN << " VV=" << VV << " nrep=" << nrep << std::endl;
 
   std::array<xt::xarray<float>, 36> input;
   for (size_t i=0;i<36;++i) input[i] = xt::linspace<float>(i,i+100,NN);
 
   std::cout << "done preparing input" << std::endl;
+  std::cout << std::endl;
 
   test_v0(input,0);
   // test_v0(input,1);
   // test_v0(input,2);
+
+  std::cout << std::endl;
+  test_v4(input,0);
+  std::cout << std::endl;
+  test_v5(input,0);
+  std::cout << std::endl;
+  test_plainArray_elVVmx(input,1,1);
+
   std::cout << std::endl;
   test_v1(input,0);
   // test_v1(input,1);
